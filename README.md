@@ -3,5 +3,5 @@
 
 ## 下面是页面展示
 ### 首先是登录注册页面
-![Image text]("/photo/1.jpg")
+![Image text]("photo/1.jpg")
 
