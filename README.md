@@ -3,5 +3,5 @@
 
 ## 下面是页面展示
 ### 首先是登录注册页面
-![Image text]()
+![Image text](https://github.com/Traeric/AwesomeBlog/tree/master/photo/1.jpg)
 
