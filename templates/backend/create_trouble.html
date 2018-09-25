@@ -1,0 +1,51 @@
+{% extends "backend/base.html" %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="wrapping">
+        <form action="{% url 'save_trouble_list' %}" method="post">
+        {{ trouble_form.trouble_id }}
+        <div class="w-a-title">
+            <span class="w-a-t-title having">标题</span>
+            <div class="title-input">
+                {{ trouble_form.title.errors.0 }}
+                {{ trouble_form.title }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">故障描述</span>
+            <div class="content-input">
+                {{ trouble_form.detail.errors.0 }}
+                {{ trouble_form.detail }}
+            </div>
+        </div>
+        <div class="w-a-submit">
+            <button type="submit" class="btn btn-info">保存</button>
+        </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        KindEditor.ready(function (K) {
+            editor = K.create(
+                "#detail",
+                {
+                    resizeType: 0,
+                    allowPreviewEmoticons: true,
+                    width: '98%',
+                    height: '300px',
+                    afterBlur: function(){this.sync();}
+                }
+            );
+        });
+    </script>
+{% endblock %}
+
+
+
+
+
+
+

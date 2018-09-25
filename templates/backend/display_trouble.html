@@ -1,0 +1,129 @@
+{% extends "backend/base.html" %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="wrapping">
+        <div class="search">
+            <i class="glyphicon glyphicon-search"></i>
+            <input id="trouble" type="text" placeholder="搜索条件">
+        </div>
+        <div class="title">
+            <i class="glyphicon glyphicon-calendar"></i>
+            <span>搜索报障单({{ trouble_list.count }}篇)</span>
+            <div class="add-article">
+                <a href="{% url 'create_trouble_list' %}">
+                    <i class="glyphicon glyphicon-plus-sign"></i>
+                    <span>创建报障单</span>
+                </a>
+            </div>
+        </div>
+    <div class="page-nation">
+        <div class="article-info">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>报障单标题</th>
+                        <th>状态</th>
+                        <th>评价</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {% for trouble in trouble_list %}
+                <tr>
+                    <td><a href="">{{ trouble.title }}</a></td>
+                    <td>{{ trouble.get_status_display }}</td>
+                    <td>
+                        {% if trouble.evaluate %}
+                        <span style="color: #f00;">{{ trouble.get_evaluate_display }}</span>
+                        {% else %}
+                            未评价
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if trouble.status == 1 %}
+                        <span class="label label-danger con">
+                            <i class="glyphicon glyphicon-remove"></i>
+                            删除
+                        </span>
+                        <span class="label label-info edit con">
+                            <i class="glyphicon glyphicon-leaf"></i>
+                            <a href="{% url "create_trouble_list" %}?trouble_id={{ trouble.id }}" style="color: #fff;">编辑</a>
+                        </span>
+                        {% endif %}
+                        {% if trouble.status == 3 %}
+                        <span class="label label-success con" style="margin-left: 10px;">
+                            <i class="glyphicon glyphicon-eye-open"></i>
+                            <a href="{% url 'watch_solve_plan' %}?trouble_id={{ trouble.id }}" style="color: #fff;">查看解决方案</a>
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+        <div class="page-nation">
+            <nav aria-label="...">
+                <ul class="pagination">
+                    {% if page_obj.current_page <= 1 %}
+                    <li class="disabled">
+                        <a href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="javascript: void(0);" aria-label="Previous" onclick="pageNation('{{ page_obj.url }}', {{ page_obj.previous_page }});">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for page in page_obj.page_nation %}
+                        {% if page == page_obj.current_page %}
+                        <li class="active"><a href="javascript:void(0);">{{ page }}</a></li>
+                        {% else %}
+                        <li><a href="javascript:void(0);" onclick="pageNation('{{ page_obj.url }}', {{ page }});">{{ page }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.current_page >= page_obj.max_page %}
+                    <li class="disabled">
+                        <a href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="javascript:void(0);" aria-label="Next" onclick="pageNation('{{ page_obj.url }}', {{ page_obj.next_page }});">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/backend/modify.js"></script>
+    <script>
+        // 分页
+        function pageNation(url, page){
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {"page": page},
+                success: function(args){
+                    $(".page-nation").html(args);
+                }
+            });
+        }
+
+        // 搜索报账单
+        let ptDom = $("#trouble");
+        ptDom.get(0).oninput = search.bind(ptDom, '{% url "search_trouble_list" %}');
+    </script>
+{% endblock %}
+
+
+
+

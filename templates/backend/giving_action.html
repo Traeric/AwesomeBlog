@@ -1,0 +1,137 @@
+{% extends "backend/base.html" %}
+{% load count_article %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="add-category clearFloat">
+        <div class="c-title">搜索名称</div>
+        <div class="c-input">
+            <input id="search_input" type="text" placeholder="请输入要搜索的用户名称">
+        </div>
+        <div class="c-button">
+            <button id="search_button" type="button" class="btn btn-warning">搜索</button>
+        </div>
+    </div>
+    <div class="title">
+        <i class="glyphicon glyphicon-calendar"></i>
+        <span>权限分配</span>
+    </div>
+    <div class="center">
+        <div class="find-user">
+            <div class="alert alert-info" role="alert">用户名称</div>
+            <div class="content">
+                <select id="user_id" class="user_select">
+                    {% for u in users %}
+                    <option value="{{ u.id }}">{{ u.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="giving-action">
+            <div class="alert alert-success" role="alert">权限分配</div>
+            <div class="content clearFloat">
+                <div class="c-left">
+                    <label for="left">可选角色:</label>
+                    <select id="left" multiple>
+                        {% for role in roles %}
+                        <option value="{{ role.id }}">{{ role.caption }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="center">
+                    <i id="to_right" class="glyphicon glyphicon-arrow-right"></i>
+                    <i id="to_left" class="glyphicon glyphicon-arrow-left"></i>
+                </div>
+                <div class="c-right">
+                    <label for="right">已选角色:</label>
+                    <select id="right" multiple>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="button">
+        <button id="save_botton" type="button" class="btn btn-warning   ">保存角色</button>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        // 将选中目标右移
+        $('#to_right').click(function(){
+            // 获取左边选框中已经被选中的option标签
+            let leftDom = $("#left option:selected");
+            // 将自身移除
+            leftDom.remove();
+            // 将移除的标签添加到右边的选框中
+            $('#right').append(leftDom);
+        });
+
+        // 将选中目标左移
+        $('#to_left').click(function(){
+            // 获取右边选框中已经被选中的option标签
+            let rightDom = $("#right option:selected");
+            // 将自身移除
+            rightDom.remove();
+            // 将移除的标签添加到左边的选框中
+            $('#left').append(rightDom);
+        });
+
+        // 保存角色
+        $("#save_botton").click(function(){
+            // 获取用户id
+            let userId = $("#user_id option:selected").val();
+            // 获取要赋予的角色
+            let roleDom = $("#right option:selected");
+            let roleList = [];
+            for(let i=0; i<roleDom.length; i++){
+                roleList.push(roleDom.eq(i).val());
+            }
+            // 发送给后台
+            if(roleList.length !== 0){
+                $.ajax({
+                    url: '{% url "save_role" %}',
+                    type: 'post',
+                    traditional: true,
+                    data: {'userId': userId, 'roleList': roleList},
+                    success (args){
+                        if(args === '0'){
+                            alert('保存失败');
+                        }else{
+                            alert('保存成功');
+                        }
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+
+        // 搜索角色
+        $("#search_button").click(function(){
+            // 获取用户名
+            let userName = $("#search_input").val().trim();
+            // 发送给后端查询
+            if(userName !== ''){
+                $.ajax({
+                    url: '{% url "search_user" %}',
+                    type: 'post',
+                    data: {'userName': userName},
+                    success (args){
+                        if(args === '0'){
+                            alert('用户名不存在');
+                        }else if(args === '-1'){
+                            alert('最高管理员不能被搜索');
+                        }else{
+                            // 满足条件
+                            $("#user_id").val(args);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}
+
+
+
+

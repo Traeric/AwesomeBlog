@@ -1,0 +1,32 @@
+{% extends "my_home/base.html" %}
+
+{% block title %}
+    {{ blog.title }}-个人主页
+{% endblock %}
+
+{% block change_area %}
+    <div class="article-area">
+        {% for article in articles %}
+        <div class="article">
+            <div class="title">
+                <span class="t-time">{{ article.ctime|date:'Y年m月d日' }}</span>
+                <span>{{ article.title }}</span>
+            </div>
+            <div class="content">
+                <span>摘要：</span>
+                <span>
+                    {{ article.summary }}
+                </span>
+                <span><a href="{% url "article_detail" blog.surfix article.id %}">阅读全文</a></span>
+            </div>
+            <div class="tail">
+                <span>post @ </span>
+                <span>{{ article.ctime|date:"Y-m-d" }}{{ article.ctime|time:"H:i" }}</span><!-- 2017-4-22 18:16 -->
+                <span>阅读(16)</span>
+                <span>评论({{ article.comment_set.count }})</span>
+                <span><a href="#">编辑</a></span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

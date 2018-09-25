@@ -1,0 +1,84 @@
+{% extends "backend/base.html" %}
+{% load count_article %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="add-category clearFloat">
+        <div class="c-title">分类名称</div>
+        <div class="c-input">
+            <input type="text" placeholder="请输入分类名称">
+        </div>
+        <div class="c-button">
+            <button id="add_category" type="button" class="btn btn-warning">添加</button>
+        </div>
+    </div>
+    <div class="title">
+        <i class="glyphicon glyphicon-calendar"></i>
+        <span>分类列表</span>
+    </div>
+    <div class="article-info">
+            <table id="tag_table" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>分类</th>
+                        <th>文章个数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {% for category in categorys %}
+                <tr>
+                    <td><a href="#">{{ category.caption }}</a></td>
+                    <td><a href="#">{{ category|count_category:blog.user }}</a></td>
+                    <td>
+                        <span class="label label-danger con">
+                            <a href="{% url 'delete_category' %}?categoryId={{ category.id }}" style="color: #fff;">
+                                <i class="glyphicon glyphicon-remove"></i>
+                                <span>删除</span>
+                            </a>
+                        </span>
+                        <span class="label label-info edit con" data-nid="{{ category.id }}">
+                            <i class="glyphicon glyphicon-leaf"></i>
+                            <a href="javascript:void(0);" style="color: #fff;">编辑</a>
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/backend/modify.js"></script>
+    <script>
+        // 添加分类
+        $('#add_category').click(function(){
+            // 获取分类名称
+            let categoryName = $('input[type=text]').val().trim();
+            if(categoryName !== ''){
+                // 如果不等于空就发送ajax
+                $.ajax({
+                    url: "{% url 'add_category' %}",
+                    type: 'post',
+                    data: {"categoryName": categoryName},
+                    success: function (data) {
+                        if(data === '0'){
+                            alert('添加失败');
+                        }else{
+                            alert('添加成功');
+                        }
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+
+        // 修改分类
+        update('{% url "modify_category" %}');
+    </script>
+{% endblock %}
+
+
+
+

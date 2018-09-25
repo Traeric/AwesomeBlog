@@ -1,0 +1,79 @@
+<div class="article-info">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>报障单标题</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+    <tbody>
+        {% for trouble in trouble_list %}
+        <tr>
+            <td><a href="">{{ trouble.title }}</a></td>
+            <td>{{ trouble.get_status_display }}</td>
+            <td>
+                {% if trouble.status == 1 %}
+                <span id="get_trouble" class="label label-warning con" data-tid="{{ trouble.id }}">
+                    <i class="glyphicon glyphicon-shopping-cart"></i>
+                    接单
+                </span>
+                {% endif %}
+                {% if trouble.status == 2 %}
+                <span class="label label-info edit con">
+                    <i class="glyphicon glyphicon-leaf"></i>
+                    <a href="{% url "handle_trouble_list" %}?trouble_id={{ trouble.id }}" style="color: #fff;">处理方案</a>
+                </span>
+                {% endif %}
+                {% if trouble.status == 3 %}
+                <span class="label label-success edit con">
+                    <i class="glyphicon glyphicon-eye-open"></i>
+                    <a href="{% url "watch_solve_plan" %}?trouble_id={{ trouble.id }}" style="color: #fff;">查看</a>
+                </span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+<div class="page-nation">
+    <nav aria-label="...">
+        <ul class="pagination">
+            {% if page_nation.current_page == 1 %}
+                <li class="disabled">
+                    <a href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="javascript:void(0);" aria-label="Previous" onclick="pageNation('{{ page_nation.url }}', {{ page_nation.previous_page }});">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page in page_nation.page_nation %}
+                {% if page_nation.current_page == page %}
+                    <li class="active"><a href="javascript:void(0);">{{ page}}</a></li>
+                {% else %}
+                    <li>
+                        <a href="javascript:void(0);" onclick="pageNation('{{ page_nation.url }}', {{ page }});">
+                            {{ page }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_nation.current_page == page_nation.max_page %}
+            <li class="disabled"><a href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+            {% else %}
+            <li>
+                <a href="javascript:void(0);" aria-label="Next" onclick="pageNation('{{ page_nation.url }}', {{ page_nation.next_page }});">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+

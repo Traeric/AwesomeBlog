@@ -1,0 +1,268 @@
+{% extends "my_home/base.html" %}
+{% load staticfiles %}
+{% load count_article %}
+{% load load_comment %}
+
+{% block title %}
+    {{ article.title }}
+{% endblock %}
+
+{% block change_area %}
+    <div class="article_detail">
+        <div class="a-title">
+            {{ article.title }}
+        </div>
+        <div class="a-content">
+            {{ article.detail|safe }}
+        </div>
+        <div class="a-footer">
+            <div class="thumb-up clearfloat">
+                <div id="thumb-up" class="up con" data-article-id="{{ article.id }}">
+                    <i class="glyphicon glyphicon-thumbs-up"></i>
+                    <span>{{ article.id|get_thumb }}</span>
+                </div>
+                <div id="thumb-down" class="down con" data-article-id="{{ article.id }}">
+                    <i class="glyphicon glyphicon-thumbs-down"></i>
+                    <span>{{ article.id|get_thumb_down }}</span>
+                </div>
+            </div>
+            <div class="author-info">
+                {{ article.ctime }} <a href="javascript:void(0);">{{ blog.title }}</a> 评论({{ article.comment_set.count }}) 阅读(14)
+            </div>
+            <div class="warning clearfloat">
+                <div class="img">
+                    <img src="{% static 'images/my_home/warning.png' %}" alt="IMG">
+                </div>
+                <div class="word">
+                    <span>作者：<a href="#">{{ blog.title }}</a></span><br>
+                    <span>出处：<a href="#">http://www.cnblogs.com/articles</a></span><br>
+                    <span>本文版权归作者所有，欢迎转载，但未经作者同意必须保留此段声明，且在文章明显位置给出原文链接</span>
+                </div>
+            </div>
+            <div class="comment">
+                <div class="c-title">评论列表</div>
+                {% for comment in comments %}
+                <div class="c-content">
+                  <div class="c-comment">
+                       <div class="c-person"><a href="javascript:void(0);">
+                           {{ comment.user.username }}</a>
+                           <span>{{ comment.ctime|date:'Y-m-d' }} {{ comment.ctime|time:'h:i' }}</span>
+                       </div>
+                       <div class="content">{{ comment.content|safe }}</div>
+                       <!-- 在这里加载子评论 -->
+                       {% load_comment comment.child %}
+                  </div>
+                   <div class="return re-comment" data-nid="{{ comment.id }}" data-user="{{ comment.user.username }}">
+                        <a href="javascript:void(0);">回复</a>
+                   </div>
+                </div>
+                {% endfor %}
+                <div class="page-nation">
+                    <!-- 分页 -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                        {% if page_obj.current_page == 1 %}
+                            <li class="disabled">
+                                <a href="javascript:void(0);" aria-label="Previous">
+                                    <span aria-hidden="true">上一页</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="javascript:void(0);" aria-label="Previous"
+                                   onclick="page_click(this, '{{ page_obj.url }}', {{ page_obj.previous_page }}, {{ article.id }});">
+                                    <span aria-hidden="true">上一页</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+
+                            {% for page in page_obj.page_nation %}
+                                {% if page_obj.current_page == page %}
+                                    <li class="active"><a href="javascript:void(0);">{{ page }}</a></li>
+                                {% else %}
+                                    <li><a href="javascript:void(0);"
+                                    onclick="page_click(this, '{{ page_obj.url }}', {{ page }}, {{ article.id }});">{{ page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.current_page == page_obj.max_page %}
+                                <li class="disabled">
+                                    <a href="javascript:void(0);" aria-label="Next">
+                                        <span aria-hidden="true">下一页</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="javascript:void(0);" aria-label="Next"
+                                    onclick="page_click(this, '{{ page_obj.url }}', {{ page_obj.next_page }}, {{ article.id }});">
+                                        <span aria-hidden="true">下一页</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </nav>
+                </div>
+                <div class="write-comment">
+                    {% if is_login %}
+                        <textarea name="comment" id="comment"></textarea>
+                    {% else %}
+                        <div class="cover">
+                            需要<a href="{% url 'show_login_page' %}">登录</a>才能发表评论哦~~
+                        </div>
+                        <textarea name="comment" id="comment"></textarea>
+                    {% endif %}
+                    <div id="commit">
+                        <button type="button" class="btn btn-info comment-commit" onclick="comment_click();">提交评论</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 模态对话框 -->
+    <div class="modal fade" id="comment_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">回复评论</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">回复</label>
+                        <input id="re-comment" type="text" name="comment" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="submit_comment" type="button" class="btn btn-primary">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+        // 获取评论内容
+        function comment_click(){
+            var comment_content = editor.html();
+            if(comment_content !== ""){
+                $.ajax({
+                    url: "{% url 'save_comment' %}",
+                    type: "post",
+                    dataType: 'JSON',
+                    data: {"comment_content": comment_content, "article_id": {{ article.id }}},
+                    success: function(arg){
+                        if(arg.status){
+                            window.location.reload();
+                        }
+                        alert(arg.info);
+                    }
+                });
+            }
+        }
+
+        // 分页
+        function page_click(othis, url, page, article_id){
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {'page': page, "article_id": article_id},
+                success: function(arg){
+                    $(".comment").html(arg);
+                    // 加载富文本
+                    var sc = document.createElement("script");
+                    sc.src = "{% static 'js/my_home.js' %}";
+                    $("body").append(sc);
+                    $(sc).remove();
+                }
+            });
+        }
+
+        // 赞踩关系
+        $("#thumb-up").click(function(){
+            // 发送点赞信息
+            // 获取文章id
+            let othis = $(this);
+            let article_id = $(this).data("article-id");
+            $.ajax({
+                url: '{% url "thumb" %}',
+                type: 'post',
+                data: {'article_id': article_id, 'is_thumb_up': 1},
+                success: function(args){
+                    if(args === '0'){
+                        alert('您已为该文章点过赞了');
+                    }else{
+                        alert('点赞成功');
+                    }
+                    // 刷新点赞数
+                    othis.children('span').html({{ article.id|get_thumb }} + 1);
+                }
+            });
+        });
+        $('#thumb-down').click(function () {
+            // 踩本篇文章
+            // 获取文章id
+            let article_id = $(this).data("article-id");
+            let othis = $(this);
+            $.ajax({
+                url: '{% url "thumb" %}',
+                type: 'post',
+                data: {'article_id': article_id, 'is_thumb_up': 0},
+                success: function(args){
+                    if(args === '0'){
+                        alert('您已为该文章点过赞了');
+                    }else{
+                        alert('已踩');
+                    }
+                    // 刷新踩文章数
+                    othis.children('span').html({{ article.id|get_thumb_down }} + 1);
+                }
+            });
+        });
+
+        // 回复评论
+        $(".comment").on('click', ".re-comment", function(){
+            // 获取评论的id
+            let nid = $(this).data("nid");
+            // 获取评论人的名字
+            let username = $(this).data("user");
+            // 激活模态对话框
+            $("#re-comment").attr('placeholder', '回复' + username + ":");
+            $("#comment_Modal").modal("show");
+
+            // 激活click点击事件
+            $('#submit_comment').click(function(){
+                // 获取评论
+                let re_comment = $("#re-comment").val().trim();
+                if(re_comment !== ""){
+                    // 将父评论的id、回复评论内容、文章id发送
+                    $.ajax({
+                        url: '{% url "re_comment" %}',
+                        type: "post",
+                        data: {'parent_id': nid, 'comment_content': re_comment, 'article_id': {{ article.id }}},
+                        success (args){
+                            if(args === "0"){
+                                alert('服务器开小差啦，稍后再试吧~~~');
+                            }else{
+                                alert('提交成功');
+                                window.location.reload();    // 刷新页面
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+
+
+

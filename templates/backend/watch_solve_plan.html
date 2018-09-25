@@ -1,0 +1,102 @@
+{% extends "backend/base.html" %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="wrapping">
+        <form action="{% url 'evaluate' %}" method="post">
+        {{ solve_plan_form.trouble_id }}
+        <div class="w-a-title">
+            <span class="w-a-t-title having">标题</span>
+            <div class="title-input">
+                {{ trouble.title }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">故障描述</span>
+            <div class="content-input">
+                {{ trouble.detail }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">报障者</span>
+            <div class="content-input">
+                {{ trouble.sender.username }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">报障时间</span>
+            <div class="content-input">
+                {{ trouble.ctime }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">处理者</span>
+            <div class="content-input">
+                {{ trouble.handler.username }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">解决方案</span>
+            <div class="content-input" style="background-color: #fff; padding: 10px 20px; border: 1px solid #dedede;">
+                {{ trouble.solve_plan|safe }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">解决时间</span>
+            <div class="content-input">
+                {{ trouble.stime }}
+            </div>
+        </div>
+        <div class="w-a-content" style="margin-bottom: 20px;">
+            {% if user == 0 %}    <!-- 提交人看到的评价状态，可以评价 -->
+                {% if trouble.evaluate %}
+                    已评价：{{ trouble.get_evaluate_display }}
+                {% else %}
+                <span class="having">给个评价吧</span>
+                <div class="content-input">
+                    {{ solve_plan_form.evaluate }}
+                </div>
+                {% endif %}
+            {% else %}     <!-- 处理人看到的评价状态，不可以评价 -->
+                <span class="having">评价</span>
+                <div class="content-input">
+                    {% if trouble.evaluate %}
+                        <span style="color: #f00;">{{ trouble.get_evaluate_display }}</span>
+                    {% else %}
+                        未评价
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        {% if user == 0 and not trouble.evaluate %}
+            <div class="w-a-submit">
+                <button type="submit" class="btn btn-info">保存</button>
+            </div>
+        {% endif %}
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        KindEditor.ready(function (K) {
+            editor = K.create(
+                "#detail",
+                {
+                    resizeType: 0,
+                    allowPreviewEmoticons: true,
+                    width: '98%',
+                    height: '300px',
+                    afterBlur: function(){this.sync();}
+                }
+            );
+        });
+    </script>
+{% endblock %}
+
+
+
+
+
+
+

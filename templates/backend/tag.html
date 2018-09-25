@@ -1,0 +1,84 @@
+{% extends "backend/base.html" %}
+{% load count_article %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="add-category clearFloat">
+        <div class="c-title">标签名称</div>
+        <div class="c-input">
+            <input type="text" placeholder="请输入标签名称">
+        </div>
+        <div class="c-button">
+            <button id="add_tag" type="button" class="btn btn-warning">添加</button>
+        </div>
+    </div>
+    <div class="title">
+        <i class="glyphicon glyphicon-calendar"></i>
+        <span>标签列表</span>
+    </div>
+    <div class="article-info">
+            <table id="tag_table" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>标签</th>
+                        <th>文章个数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tag in tags %}
+                    <tr>
+                        <td><a href="javascript:void(0);">{{ tag.caption }}</a></td>
+                        <td><a href="javascript:void(0);">{{ tag|count_tag:blog.user }}</a></td>
+                        <td>
+                            <span class="label label-danger con">
+                                <a href="{% url 'delete_tag' %}?tagId={{ tag.id }}" style="color: #fff;">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                    <span>删除</span>
+                                </a>
+                            </span>
+                            <span class="label label-info edit con edit" data-nid="{{ tag.id }}">
+                                <i class="glyphicon glyphicon-leaf"></i>
+                                <a href="javascript:void(0);" style="color: #fff;">编辑</a>
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/backend/modify.js"></script>
+    <script>
+        // 添加标签
+        $("#add_tag").click(function(){
+            // 获取标签名称
+            let tagName = $("input[type=text]").val();
+            if(tagName.trim() !== ''){
+                // 不等于空才发送
+                $.ajax({
+                    url: "{% url 'add_tag' %}",
+                    type: 'post',
+                    data: {'tagName': tagName},
+                    success: function (data) {
+                        if(data === '0'){
+                            alert('添加失败');
+                        }else{
+                            alert('添加成功');
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+        });
+        // 修改标签
+        update('{% url 'modify_tag' %}');
+
+    </script>
+{% endblock %}
+
+
+
+

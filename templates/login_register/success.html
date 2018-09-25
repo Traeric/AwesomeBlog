@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册成功</title>
+    <style>
+        a{text-decoration: none; color: #4cae4c;}
+    </style>
+</head>
+<body>
+    <h1>successful</h1>
+    <h2>注册成功，3秒后跳转到登陆页面，如未跳转，请点击<a href="{% url 'show_login_page' %}">这里跳转</a></h2>
+    <script>
+        setInterval(function(){
+            window.location.href = "{% url 'show_login_page' %}"
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+{% load staticfiles %}
+{% load count_article %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/my_home.css' %}">
+    <link rel="stylesheet" href="{% static "plugins/bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "plugins/bootstrap/css/bootstrap.min.css" %}">
+</head>
+<body>
+    <div id="wrapping">
+        <div class="header">
+            <div class="personnal-title">
+                <a href="#">{{ blog.title }}</a>
+            </div>
+        </div>
+        <div class="friendly-links">
+            <ul class="nav-list click-list">
+                <li class="active"><a href="{% url "home" 0 %}" style="display: block;">首页</a></li>
+                <li><a href="{% url "my_home" blog.surfix %}" style="display: block;">个人首页</a></li>
+                <li><a href="{% url 'add_article' %}" style="display: block;">新文章</a></li>
+                <li><a href="{% url 'index' %}" style="display: block;">管理</a></li>
+            </ul>
+        </div>
+        <div class="body clearfloat">
+            <div class="menu">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">公告</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="inform-list">
+                            <li>昵称：{{ blog.user.username }}</li>
+                            <li>粉丝：{{ blog.user.fans.all.count }}</li>
+                            <li>关注：{{ blog.user.refans.all.count }}</li>
+                            <li>邮箱：{{ blog.user.email }}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">标签</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="tag-list">
+                            {% for tag in blog.tag_set.all %}
+                            <li><a href="{% url 'article_filter' blog.surfix 'tag' tag.id %}">{{ tag.caption }}({{ tag|count_tag:blog.user }})</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">分类</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="category-list">
+                            {% for category in blog.category_set.all %}
+                            <li>
+                                <a href="{% url 'article_filter' blog.surfix 'category' category.id %}">
+                                    {{ category.caption }}({{ category|count_category:blog.user }})
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">时间</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="time-list">
+                            {% for date_list in article_by_time %}
+                                <li>
+                                    <a href="{% url 'article_filter' blog.surfix 'time' date_list.create_time %}">
+                                        {{ date_list.create_time }}({{ date_list.num }})
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% block change_area %}{% endblock %}
+        </div>
+        <div class="footer">
+            Design By ©
+            <span>Jin同学</span>
+        </div>
+    </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static "plugins/kindeditor/kindeditor-all-min.js" %}"></script>
+    <script src="{% static 'js/my_home.js' %}"></script>
+    {% block js %}
+    {% endblock %}
+</body>
+</html>

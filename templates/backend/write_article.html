@@ -1,0 +1,79 @@
+{% extends "backend/base.html" %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="wrapping">
+        <form action="{% url 'add_article' %}" method="post">
+        {{ article_form.article_id }}
+        <div class="w-a-title">
+            <span class="w-a-t-title having">标题</span>
+            <div class="title-input">
+                {{ article_form.title }}
+            </div>
+        </div>
+        <div class="w-a-introduction">
+            <span class="having">简介</span>
+            <div class="introduction-input">
+                {{ article_form.summary }}
+            </div>
+        </div>
+        <div class="w-a-content">
+            <span class="having">内容</span>
+            <div class="content-input">
+                {{ article_form.detail }}
+            </div>
+        </div>
+        <div class="w-a-type">
+            <span class="having">类型</span>
+            <div class="type-input">
+                <ul class="type-list having">
+                    {{ article_form.main_stack_category }}
+                </ul>
+            </div>
+        </div>
+        <div class="w-a-category">
+            <span class="having">分类</span>
+            <div class="category-input">
+                <ul class="category-list having">
+                    {{ article_form.category_id }}
+                </ul>
+            </div>
+        </div>
+        <div class="w-a-tag">
+            <span class="having">标签</span>
+            <div class="tag-input">
+                <ul class="tag-list having">
+                    {{ article_form.tag_id }}
+                </ul>
+            </div>
+        </div>
+        <div class="w-a-submit">
+            <button type="submit" class="btn btn-info">保存</button>
+        </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        KindEditor.ready(function (K) {
+            editor = K.create(
+                "#content",
+                {
+                    resizeType: 0,
+                    allowPreviewEmoticons: true,
+                    width: '98%',
+                    height: '600px',
+                    afterBlur: function(){this.sync();}
+                }
+            );
+        });
+    </script>
+{% endblock %}
+
+
+
+
+
+
+

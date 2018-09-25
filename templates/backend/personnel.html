@@ -1,0 +1,128 @@
+{% extends "backend/base.html" %}
+{% load staticfiles %}
+{% load user_header %}
+
+{% block show %}
+    {{ block.super }}
+    <form action="{% url 'modify_personnel' %}" method="post">
+    <div class="wrap">
+        <div class="clearFloat">
+        <div class="left">
+            <div class="form-div">
+                <span>用户名</span>
+                {{ p_form.user_name }}
+                <div class="trangle"></div>
+                <i>{{ p_form.errors.user_name.0 }}</i>
+            </div>
+            <div class="form-div">
+                <span>邮箱</span>
+                {{ p_form.email }}
+                <div class="trangle"></div>
+                <i>{{ p_form.errors.email.0 }}</i>
+            </div>
+            <div class="form-div">
+                <span>博客标题</span>
+                {{ p_form.blog_title }}
+            </div>
+            <div class="form-div">
+                <span>博客地址</span>
+                {{ p_form.blog_surfix }}
+                <div class="trangle"></div>
+                <i>{{ p_form.errors.blog_surfix.0 }}</i>
+            </div>
+            <div class="form-div">
+                <span>博客主题</span>
+                {{ p_form.theme }}
+            </div>
+        </div>
+        <div class="right">
+            <div class="r-top">
+                <a id="personnel-img" href="javascript:void(0);">
+                    <img src="{{ user_info.id|user_header }}" alt="IMG" width="192px" height="192px">
+                </a>
+            </div>
+            <div class="r-bottom">
+                点击图片更换
+            </div>
+        </div>
+        </div>
+        <div class="bottom">
+            <span>博客标题内容</span>
+            {{ p_form.sammary }}
+        </div>
+        <div class="submit">
+            <button type="submit" class="btn btn-info">保存</button>
+        </div>
+    </div>
+    </form>
+
+    <!-- 模态对话框 -->
+    <div id="img_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="btnclose" aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">更换图片</h4>
+                </div>
+                <div class="modal-body">
+                    <h4 class="img-fore-watch">图片预览</h4>
+                    <div id="previous_view">
+                        <!-- 显示图片 -->
+                    </div>
+                    <iframe id="ifram" name="form"></iframe>
+                    <form id="file-form" action="{% url 'set_header' %}" method="post" target="form" enctype="multipart/form-data">
+                        <div class="file">
+                            <input id="input-file" type="file" name="header_img">
+                            <button type="button" class="btn btn-info">更换图片</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btnclose" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock %}
+
+{% block js %}
+    <script>
+        let iContentDom = $(".show .wrap .left .form-div i");
+        iContentDom.each(function(index, item){
+            let iContent = $(item).html();
+            if(iContent !== ""){
+                $(item).css('display', 'block');
+                $(`.show .wrap .left .form-div div.trangle:eq(${index})`).css('display', 'block');
+            }
+        });
+
+        // 点击更换图片
+        $("#personnel-img").click(function(){
+            $("#img_modal").modal("show");
+        });
+        // 一旦选中了图片，立即提交
+        $("#input-file").change(function(){
+            // 为ifram绑定reload事件
+            $("#ifram").get(0).onload = function(){
+                // 获取图片路径
+                let path = $(this).contents().find('body').html();
+                // 设置给div显示
+                let imgDom = document.createElement('img');
+                imgDom.src =  '\\' + path + "?";
+                imgDom.width = 300;
+                imgDom.height = 300;
+                $("#previous_view").empty().append(imgDom);
+            };
+            // 提交表单
+            $("#file-form").submit();
+        });
+        // 点击close刷新页面
+        $(".btnclose").click(function(){
+            window.location.reload();
+        });
+    </script>
+{% endblock %}
+
+
+
+

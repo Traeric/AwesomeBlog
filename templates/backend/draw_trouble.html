@@ -1,0 +1,80 @@
+{% extends "backend/base.html" %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="wrapping">
+        <div class="title" style="font-size: 24px; font-weight: bolder; color: #000; height: 60px;
+        line-height: 60px; text-align: center;">
+            管理员处理报障的情况
+        </div>
+        <div id="trouble_table" style="min-width:400px; height:400px;"></div>
+    </div>
+{% endblock %}
+
+{% block js %}
+{#<script src="{% static 'plugins/highchars/dark-unica.js' %}"></script>#}
+{#<script src="{% static 'plugins/highchars/exporting.js' %}"></script>#}
+{#<script src="{% static 'plugins/highchars/highcharts.js' %}"></script>#}
+{#<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>#}
+    <script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+    <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+    <script src="https://img.hcharts.cn/highcharts/themes/dark-unica.js"></script>
+    <script>
+        let seriesArray = null;
+        $.ajax({
+            url: '{% url 'get_data' %}',
+            type: "post",
+            dataType: 'JSON',
+            success(args){
+                seriesArray = args;
+                draw();
+            }
+        });
+        function draw(){
+            let chart = Highcharts.chart('trouble_table', {
+            chart: {
+                type: 'spline'
+            },
+            title: {
+                text: '报障信息表'
+            },
+            subtitle: {
+                text: '非规律性时间内的变化'
+            },
+            xAxis: {
+                type: 'datetime',
+                title: {
+                    text: '月份'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: '处理报障单数量(个)'
+                },
+                min: 0
+            },
+            tooltip: {
+                headerFormat: '<b>{series.name}</b><br>',
+                pointFormat: '{point.x:%e. %b}: {point.y:.2f} 个'
+            },
+            plotOptions: {
+                spline: {
+                    marker: {
+                        enabled: true
+                    }
+                }
+            },
+            series: seriesArray
+        });
+        }
+
+
+    </script>
+{% endblock %}
+
+
+
+
+
+

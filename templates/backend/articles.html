@@ -1,0 +1,148 @@
+{% extends "backend/base.html" %}
+
+{% block show %}
+    {{ block.super }}
+    <div class="wrapping">
+        <div class="search">
+            <i class="glyphicon glyphicon-search"></i>
+            <input id="article_search" type="text" placeholder="搜索条件">
+        </div>
+        <div class="select-area clearFloat">
+            <div class="tag clearFloat">
+                <ul class="tag-list clearFloat">
+                    {% if main_stack_num == 0 %}
+                        <li class="active">全部</li>
+                    {% else %}
+                        <li class="no-active"><a href="{% url 'article' 0 category_num %}">全部</a></li>
+                    {% endif %}
+                    {% for cg in main_stack %}
+                        {% if main_stack_num == cg.0 %}
+                        <li class="active">{{ cg.1 }}</li>
+                        {% else %}
+                        <li class="no-active"><a href="{% url 'article' cg.0 category_num %}">{{ cg.1 }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="main-stack clearFloat">
+                    <ul class="tag-list clearFloat">
+                    {% if category_num == 0 %}
+                        <li class="active">全部</li>
+                    {% else %}
+                        <li class="no-active"><a href="{% url 'article' main_stack_num 0 %}">全部</a></li>
+                    {% endif %}
+                    {% for cg in personnel_category %}
+                        {% if category_num == cg.id %}
+                        <li class="active">{{ cg.caption }}</li>
+                        {% else %}
+                        <li class="no-active"><a href="{% url 'article' main_stack_num cg.id %}">{{ cg.caption }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+            </div>
+        </div>
+        <div class="title">
+            <i class="glyphicon glyphicon-calendar"></i>
+            <span>搜索文章({{ total_count }}篇)</span>
+            <div class="add-article">
+                <a href="{% url 'add_article' %}">
+                    <i class="glyphicon glyphicon-plus-sign"></i>
+                    <span>创建新文章</span>
+                </a>
+            </div>
+        </div>
+    <div class="page-nation">
+        <div class="article-info">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>文章标题</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr>
+                    <td><a href="{% url 'article_detail' blog.surfix article.id %}">{{ article.title }}</a></td>
+                    <td>
+                        <span class="label label-danger con">
+                            <i class="glyphicon glyphicon-remove"></i>
+                            删除
+                        </span>
+                        <span class="label label-info edit con">
+                            <i class="glyphicon glyphicon-leaf"></i>
+                            <a href="{% url 'modify_article' article.id %}" style="color: #fff;">编辑</a>
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+        <div class="page-nation">
+            <nav aria-label="...">
+                <ul class="pagination">
+                    {% if page_obj.current_page == 1 %}
+                        <li class="disabled">
+                            <a href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="javascript:void(0);" aria-label="Previous" onclick="pageNation('{{ page_obj.url }}', {{ page_obj.previous_page }});">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for page in page_obj.page_nation %}
+                        {% if page_obj.current_page == page %}
+                            <li class="active"><a href="javascript:void(0);">{{ page}}</a></li>
+                        {% else %}
+                            <li>
+                                <a href="javascript:void(0);" onclick="pageNation('{{ page_obj.url }}', {{ page }});">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.current_page == page_obj.max_page %}
+                    <li class="disabled"><a href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                    {% else %}
+                    <li>
+                        <a href="javascript:void(0);" aria-label="Next" onclick="pageNation('{{ page_obj.url }}', {{ page_obj.next_page }});">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="/static/js/backend/modify.js"></script>
+    <script>
+        // 分页
+        function pageNation(url, page){
+            $.ajax({
+                url: url,
+                type: "post",
+                data: {"page": page},
+                success: function(args){
+                    $(".page-nation").html(args);
+                }
+            });
+        }
+
+        // 搜索文章
+        let atDom = $("#article_search");
+        atDom.get(0).oninput = search.bind(atDom, '{% url "search_article" %}');
+
+    </script>
+{% endblock %}
+
+
+
+

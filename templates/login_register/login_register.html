@@ -1,0 +1,113 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<!-- Head -->
+<head>
+	<title>登录表单</title>
+	<!-- Meta-Tags -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+		<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<!-- //Meta-Tags -->
+
+	<!-- Style --> <link rel="stylesheet" href="{% static 'css/login_style.css' %}" type="text/css" media="all">
+    <style>
+        #code_img{width: 120px; height: 30px; float: right; margin: 5px 10px 0 0; cursor: pointer;}
+        .error-reminds{color: #f00;}
+    </style>
+</head>
+<!-- //Head -->
+
+<!-- Body -->
+<body>
+
+	<h1>登录注册页面</h1>
+
+	<div class="container w3layouts agileits">
+
+		<div class="login w3layouts agileits">
+			<h2>登 录</h2>
+
+			<form action="{% url 'login' %}" method="post">
+                <span class="error-reminds">{{ login_obj.errors.username.0 }}</span>
+                {{ login_obj.username }}<br>
+                <span class="error-reminds">{{ login_obj.non_field_errors }}</span>
+                {{ login_obj.pwd }}<br>
+                <span class="error-reminds">{{ login_obj.errors.confirm_code.0 }}</span>
+                <div class="confirm-code" style="display: inline-block;">
+                    {{ login_obj.confirm_code }}
+                    <img id="code_img" class="img-login" src="{% url 'check_code' %}" alt="IMG" >
+                </div>
+                <ul class="tick w3layouts agileits">
+                    <li>
+                        {{ login_obj.remenber_me }}
+                        <label for="brand1"><span></span>一个月内免登陆</label>
+                    </li>
+                </ul>
+                {% csrf_token %}
+                <div class="send-button w3layouts agileits">
+                    <form>
+                        <input type="submit" value="登 录">
+                    </form>
+                </div>
+            </form>
+			<div class="social-icons w3layouts agileits">
+				<p>- 其他方式登录 -</p>
+				<ul>
+					<li class="qq"><a href="#">
+					<span class="icons w3layouts agileits"></span>
+					<span class="text w3layouts agileits">QQ</span></a></li>
+					<li class="weixin w3ls"><a href="#">
+					<span class="icons w3layouts"></span>
+					<span class="text w3layouts agileits">微信</span></a></li>
+					<li class="weibo aits"><a href="#">
+					<span class="icons agileits"></span>
+					<span class="text w3layouts agileits">微博</span></a></li>
+					<div class="clear"> </div>
+				</ul>
+			</div>
+			<div class="clear"></div>
+		</div>
+
+		<div class="register w3layouts agileits">
+			<h2>注 册</h2>
+
+			<form action="{% url "register" %}" method="post">
+                <span class="error-reminds">{{ register_obj.non_field_errors }}</span>
+                <span class="error-reminds">{{ register_obj.errors.username.0 }}</span>
+                {{ register_obj.username }}<br />
+                <span class="error-reminds">{{ register_obj.errors.email.0 }}</span>
+                {{ register_obj.email }}<br>
+                <span class="error-reminds">{{ register_obj.errors.pwd.0 }}</span>
+                {{ register_obj.pwd }}<br>
+                {{ register_obj.re_password }}<br>
+                <span class="error-reminds">{{ register_obj.errors.confirm_code.0 }}</span>
+                <div class="confirm-code" style="display: inline-block;">
+                    {{ register_obj.confirm_code }}
+                    <img id="code_img" class="img-register" src="{% url 'check_code' %}" alt="IMG" >
+                </div>
+                {% csrf_token %}
+                <div class="send-button w3layouts agileits">
+                    <input type="submit" value="免费注册">
+                </div>
+            </form>
+
+			<div class="clear"></div>
+		</div>
+
+		<div class="clear"></div>
+	</div>
+    <script>
+        document.getElementsByClassName("img-login")[0].onclick = function(){
+            var src = this.getAttribute("src");
+            this.setAttribute("src", src + "?");
+        };
+        document.getElementsByClassName("img-register")[0].onclick = function(){
+            var src = this.getAttribute("src");
+            this.setAttribute("src", src + "?");
+        };
+    </script>
+</body>
+<!-- //Body -->
+</html>

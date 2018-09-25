@@ -1,0 +1,143 @@
+{% load staticfiles %}
+{% load count_article %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客主页</title>
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">老子的技术论坛</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-min" id="bs-example-navbar-collapse-6">
+                <ul class="nav navbar-nav">
+                    {% if current_category == 0 %}
+                      <li class="active"><a href="{% url 'home' 0 %}">全部</a></li>
+                    {% else %}
+                      <li><a href="{% url 'home' 0 %}">全部</a></li>
+                    {% endif %}
+                    {% for category in stack_choices %}
+                        {% if category.0 == current_category %}
+                          <li class="active"><a href="{% url 'home' category.0 %}">{{ category.1 }}</a></li>
+                        {% else %}
+                          <li><a href="{% url 'home' category.0 %}">{{ category.1 }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <ul class="nav navbar-right navbar-nav">
+                    {% if user_info %}
+                        {% if user_surfix != "" %}
+                            <li><a href="{% url 'my_home' user_surfix %}">{{ user_info.username }}</a></li>
+                            <li><a href="{% url 'my_home' user_surfix %}">我的博客</a></li>
+                        {% else %}
+                            <li><a href="javascript:void(0);" onclick="p_login();">{{ user_info.username }}</a></li>
+                            <li><a href="javascript:void(0);" onclick="p_login();">我的博客</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'index' %}">管理</a></li>
+                        <li><a href="{% url "logout" %}">退出</a></li>
+                    {% else %}
+                        <li><a href="{% url "show_login_page" %}">登陆</a></li>
+                        <li><a href="{% url "show_login_page" %}">注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="middle-content clearFloat">
+        <div class="m-left">
+            {% for article in articles %}
+            <div class="article">
+                <ul class="article-list">
+                    <li class="article-title">
+                        <a href="{% url 'article_detail' article.id|surfix_by_article article.id %}">{{ article.title }}</a>
+                    </li>
+                    <li class="article-content clearFloat">
+                        <img src="{% static 'images/1.jpg' %}" alt="IMG" height="80px" width="80px">
+                        <span>{{ article.summary }}</span>
+                    </li>
+                    <li class="article-info">
+                        <i class="glyphicon glyphicon-fire"></i>
+                        <a href="#">{{ article.user.username }}</a> 发布于 <span>{{ article.ctime|date:'Y-m-d' }}</span>
+                        <span class="comment-thumb-up">
+                            <span class="comment">
+                                <i class="glyphicon glyphicon-menu-hamburger"></i>
+                                <span>{{ article.comment_set.all.count }}</span>
+                            </span>
+                            <span class="thumb-up">
+                                <i class="glyphicon glyphicon-thumbs-up"></i>
+                                <span>{{ article.thumbup_set.all.count }}</span>
+                            </span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            {% endfor %}
+            <div class="pagenation">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page_nation.current_page == 1 %}
+                            <li class="disabled">
+                                <a href="javascript:void(0);" aria-label="Previous">
+                                    <span aria-hidden="true">上一页</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{{ page_nation.url }}?page={{ page_nation.previous_page }}" aria-label="Previous">
+                                    <span aria-hidden="true">上一页</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for page in page_nation.page_nation %}
+                            {% if page == page_nation.current_page %}
+                                <li class="active"><a href="javascript:void(0);">{{ page}}</a></li>
+                            {% else %}
+                                <li><a href="{{ page_nation.url }}?page={{ page }}">{{ page }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_nation.current_page == page_nation.max_page %}
+                            <li class="disabled">
+                                <a href="javascript:void(0);" aria-label="Next">
+                                    <span aria-hidden="true">下一页</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{{ page_nation.url }}?page={{ page_nation.next_page }}" aria-label="Next">
+                                    <span aria-hidden="true">下一页</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="m-right">
+            <div class="sincerely-recommand">
+                <div class="title">热血推荐</div>
+                {% for comment_article in comments_info %}
+                <div class="re-article"><a href="{% url 'article_detail' comment_article.user_id|surfix_by_user comment_article.id %}">{{ comment_article.title }}</a></div>
+                {% endfor %}
+            </div>
+            <div class="the-most-comment">
+                <div class="title">评论最多</div>
+                {% for comment_article in comments_info %}
+                <div class="re-article"><a href="{% url 'article_detail' comment_article.user_id|surfix_by_user comment_article.id %}">{{ comment_article.title }}</a></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script>
+        function p_login(){
+            alert("您还没有开通博客，点击管理进行开通吧~~");
+        }
+    </script>
+</body>
+</html>

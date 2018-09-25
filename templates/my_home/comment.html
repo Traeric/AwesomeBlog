@@ -1,0 +1,82 @@
+{% load load_comment %}
+
+<div class="c-title">评论列表</div>
+{% for comment in comments %}
+<div class="c-content">
+    <div class="c-comment">
+        <div class="c-person"><a href="javascript:void(0);">
+            {{ comment.user.username }}</a>
+            <span>{{ comment.ctime|date:'Y-m-d' }} {{ comment.ctime|time:'h:i' }}</span>
+        </div>
+        <div class="content">{{ comment.content|safe }}</div>
+        <!-- 在这里加载子评论 -->
+        {% load_comment comment.child %}
+    </div>
+    <div class="return re-comment" data-nid="{{ comment.id }}" data-user="{{ comment.user.username }}">
+        <a href="javascript:void(0);">回复</a>
+    </div>
+</div>
+{% endfor %}
+<div class="page-nation">
+    <!-- 分页 -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+        {% if page_obj.current_page == 1 %}
+            <li class="disabled">
+                <a href="javascript:void(0);" aria-label="Previous">
+                    <span aria-hidden="true">上一页</span>
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a href="javascript:void(0);" aria-label="Previous"
+                   onclick="page_click(this, '{{ page_obj.url }}', {{ page_obj.previous_page }}, {{ article_id }});">
+                    <span aria-hidden="true">上一页</span>
+                </a>
+            </li>
+        {% endif %}
+
+
+            {% for page in page_obj.page_nation %}
+                {% if page_obj.current_page == page %}
+                    <li class="active"><a href="javascript:void(0);">{{ page }}</a></li>
+                {% else %}
+                    <li><a href="javascript:void(0);"
+                    onclick="page_click(this, '{{ page_obj.url }}', {{ page }}, {{ article_id }});">{{ page }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.current_page == page_obj.max_page %}
+                <li class="disabled">
+                    <a href="javascript:void(0);" aria-label="Next">
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="javascript:void(0);" aria-label="Next"
+                    onclick="page_click(this, '{{ page_obj.url }}', {{ page_obj.next_page }}, {{ article_id }});">
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+</div>
+<div class="write-comment">
+    {% if is_login %}
+        <textarea name="comment" id="comment"></textarea>
+    {% else %}
+        <div class="cover">
+            需要<a href="{% url 'show_login_page' %}">登录</a>才能发表评论哦~~
+        </div>
+        <textarea name="comment" id="comment"></textarea>
+    {% endif %}
+    <div id="commit">
+        <button type="button" class="btn btn-info comment-commit" onclick="comment_click();">提交评论</button>
+    </div>
+</div>
+
+
