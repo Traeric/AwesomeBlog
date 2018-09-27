@@ -35,7 +35,7 @@
 只有管理员跟最高管理员才能处理报障单，管理员可以先接单，接单后，提交报账单的用户将不能再对该报障单做任何修改，直到该管理员处理完报账单后才能给与评价
 ![Image text](https://github.com/Traeric/AwesomeBlog/blob/master/photo/10.png?raw=true)
 #### 查看管理员每个月处理报账单的情况
-每个管理员对应一条线，只有最高管理员才能查看，这里使用了HighChars作图
+每个管理员对应一条线，只有最高管理员才能查看，这里使用了HighCharts作图
 ![Image text](https://github.com/Traeric/AwesomeBlog/blob/master/photo/11.png?raw=true)
 #### 给用户分配角色
 分配角色也只能由最高管理员分配
